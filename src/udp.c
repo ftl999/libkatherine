@@ -3,8 +3,20 @@
 //
 
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
 #include <sys/socket.h>
+#else
+#include "unistd.h"
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <sys/types.h>
+
+WSADATA wsaData;
+bool WSDataInitialized = false;
+#define INITWSDATA() if(!WSDataInitialized) { WSAStartup(MAKEWORD(2, 2), &wsaData);  WSDataInitialized = true; }
+
+#endif
 #include <string.h>
 #include <katherine/udp.h>
 
@@ -20,8 +32,9 @@
 int
 katherine_udp_init(katherine_udp_t *u, uint16_t local_port, const char *remote_addr, uint16_t remote_port, uint32_t timeout_ms)
 {
+	INITWSDATA();
     // Create socket.
-    if ((u->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+    if ((u->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
         goto err_socket;
     }
 
@@ -36,10 +49,7 @@ katherine_udp_init(katherine_udp_t *u, uint16_t local_port, const char *remote_a
 
     if (timeout_ms > 0) {
         // Set socket timeout.
-        struct timeval timeout;
-        timeout.tv_sec = timeout_ms / 1000;
-        timeout.tv_usec = 1000 * (timeout_ms % 1000);
-        if (setsockopt(u->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        if (SETTIMEOUT(u->sock, &MAKETIMEOUTSTRUCT(timeout_ms)) < 0) {
             goto err_timeout;
         }
     }
@@ -51,7 +61,8 @@ katherine_udp_init(katherine_udp_t *u, uint16_t local_port, const char *remote_a
         goto err_remote;
     }
 
-    if (pthread_mutex_init(&u->mutex, NULL) != 0) {
+	CREATEMUTEX(u->mutex);
+    if (!IS_MUTEX_VALID(u->mutex)) {
         goto err_mutex;
     }
 
@@ -61,8 +72,9 @@ err_mutex:
 err_remote:
 err_timeout:
 err_bind:
-    close(u->sock);
+    CLOSESOCK(u->sock);
 err_socket:
+	u->sock = -1;
     return 1;
 }
 
@@ -73,10 +85,11 @@ err_socket:
 void
 katherine_udp_fini(katherine_udp_t *u)
 {
-    close(u->sock);
+	CLOSESOCK(u->sock);
 
-    // Ignoring return code below.
-    (void) pthread_mutex_destroy(&u->mutex);
+	// Ignoring return code below.
+
+//	DESTROYMUTEX(u->mutex);
 }
 
 /**
@@ -92,7 +105,7 @@ katherine_udp_send_exact(katherine_udp_t* u, const void* data, size_t count)
     ssize_t sent;
     size_t total = 0;
     do {
-        sent = sendto(u->sock, data + total, count - total, 0, (struct sockaddr*) &u->addr_remote, sizeof(u->addr_remote));
+        sent = sendto(u->sock, ((const char*)data) + total, count - total, 0, (struct sockaddr*) &u->addr_remote, sizeof(u->addr_remote));
         if (sent == -1) {
             return 1;
         }
@@ -118,7 +131,7 @@ katherine_udp_recv_exact(katherine_udp_t* u, void* data, size_t count)
     socklen_t addr_len = sizeof(u->addr_remote);
 
     while (total < count) {
-        received = recvfrom(u->sock, data + total, count - total, 0, (struct sockaddr *) &u->addr_remote, &addr_len);
+        received = recvfrom(u->sock, ((char*)data) + total, count - total, 0, (struct sockaddr *) &u->addr_remote, &addr_len);
         if (received == -1) {
             return 1;
         }
@@ -158,7 +171,7 @@ katherine_udp_recv(katherine_udp_t* u, void* data, size_t* count)
 int
 katherine_udp_mutex_lock(katherine_udp_t *u)
 {
-    return pthread_mutex_lock(&u->mutex);
+    return ACQUIRE_MUTEX(u->mutex);
 }
 
 /**
@@ -169,5 +182,5 @@ katherine_udp_mutex_lock(katherine_udp_t *u)
 int
 katherine_udp_mutex_unlock(katherine_udp_t *u)
 {
-    return pthread_mutex_unlock(&u->mutex);
+    return RELEASE_MUTEX(u->mutex);
 }

@@ -85,6 +85,9 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
+#build path
+build/
+
 
 # End of https://www.gitignore.io/api/clion,cmake
 docs

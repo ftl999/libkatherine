@@ -22,10 +22,10 @@ typedef struct katherine_device {
 } katherine_device_t;
 
 int
-katherine_device_init(katherine_device_t *, const char *);
+katherine_device_init(katherine_device_t *device, const char *addr);
 
 void
-katherine_device_fini(katherine_device_t *);
+katherine_device_fini(katherine_device_t * device);
 
 #ifdef __cplusplus
 }

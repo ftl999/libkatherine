@@ -8,6 +8,12 @@
 #include <katherine/device.h>
 #include <katherine/command_interface.h>
 
+#ifndef WIN32
+#define PACKED( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#else
+#define PACKED( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
+#endif
+
 /**
  * Inquire the status of the readout.
  * @param device Katherine device
@@ -26,12 +32,13 @@ katherine_get_readout_status(katherine_device_t *device, katherine_readout_statu
     res = katherine_cmd_wait_ack_crd(&device->control_socket, crd);
     if (res) goto err;
 
+	PACKED(
     const struct {
         uint8_t hw_type;
         uint8_t hw_revision;
         uint16_t hw_serial_number;
         uint16_t fw_version;
-    } __attribute__((__packed__)) *status_crd = (const void *) &crd;
+    }) *status_crd = (const void *) &crd;
 
     status->hw_type = status_crd->hw_type;
     status->hw_revision = status_crd->hw_revision;
@@ -62,11 +69,12 @@ katherine_get_comm_status(katherine_device_t *device, katherine_comm_status_t *s
     res = katherine_cmd_wait_ack_crd(&device->control_socket, crd);
     if (res) goto err;
 
+	PACKED(
     const struct {
         uint8_t comm_lines_mask;
         uint8_t total_data_rate;
         uint8_t chip_detected_flag;
-    } __attribute__((__packed__)) *status_crd = (const void *) &crd;
+    }) *status_crd = (const void *) &crd;
 
     status->comm_lines_mask = status_crd->comm_lines_mask;
     status->data_rate = 5u * status_crd->total_data_rate;

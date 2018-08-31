@@ -6,36 +6,43 @@
 #include <string.h>
 #include <katherine/acquisition.h>
 #include <katherine/command_interface.h>
+#include "katherine\MultiplattformTypes.h"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+PACKED(
 typedef struct md {
     uint64_t : 44;
     uint8_t header : 4;
-} __attribute__((__packed__)) md_t;
+}) md_t;
 
+PACKED(
 typedef struct md_time_offset {
     uint32_t offset : 32; // 31..0
     uint16_t : 12; // 43..32
-} __attribute__((__packed__)) md_time_offset_t;
+}) md_time_offset_t;
 
+PACKED(
 typedef struct md_frame_finished {
     uint64_t n_sent : 44; // 0..43
-} __attribute__((__packed__)) md_frame_finished_t;
+}) md_frame_finished_t;
 
+PACKED(
 typedef struct md_time_lsb {
     uint32_t lsb : 32; // 31..0
     uint16_t : 12; // 43..32
-} __attribute__((__packed__)) md_time_lsb_t;
+}) md_time_lsb_t;
 
+PACKED(
 typedef struct md_time_msb {
     uint16_t msb : 16; // 15..0
     uint32_t : 24; // 43..16
-} __attribute__((__packed__)) md_time_msb_t;
+}) md_time_msb_t;
 
+PACKED(
 typedef struct md_lost_px {
     uint64_t n_lost : 44; // 43..0
-} __attribute__((__packed__)) md_lost_px_t;
+}) md_lost_px_t;
 
 #define DEFINE_PMD_MAP(SUFFIX) \
     static inline void\
@@ -53,6 +60,7 @@ typedef struct md_lost_px {
         dst->coord.y = src->coord_y;\
     }
 
+PACKED(
 typedef struct pmd_f_toa_tot {
     uint16_t ftoa : 4; // 0..3
     uint16_t tot : 10; // 13..4
@@ -60,7 +68,7 @@ typedef struct pmd_f_toa_tot {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_f_toa_tot_t;
+}) pmd_f_toa_tot_t;
 
 DEFINE_PMD_MAP(f_toa_tot)
 {
@@ -70,6 +78,7 @@ DEFINE_PMD_MAP(f_toa_tot)
     DEFINE_PMD_PAIR(tot);
 }
 
+PACKED(
 typedef struct pmd_toa_tot {
     uint16_t hit_count : 4; // 0..3
     uint16_t tot : 10; // 13..4
@@ -77,7 +86,7 @@ typedef struct pmd_toa_tot {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_toa_tot_t;
+}) pmd_toa_tot_t;
 
 DEFINE_PMD_MAP(toa_tot)
 {
@@ -87,6 +96,7 @@ DEFINE_PMD_MAP(toa_tot)
     DEFINE_PMD_PAIR(tot);
 }
 
+PACKED(
 typedef struct pmd_f_toa_only {
     uint16_t ftoa : 4; // 0..3
     uint16_t : 10; // 13..4
@@ -94,7 +104,7 @@ typedef struct pmd_f_toa_only {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_f_toa_only_t;
+}) pmd_f_toa_only_t;
 
 DEFINE_PMD_MAP(f_toa_only)
 {
@@ -103,6 +113,7 @@ DEFINE_PMD_MAP(f_toa_only)
     DEFINE_PMD_PAIR(ftoa);
 }
 
+PACKED(
 typedef struct pmd_toa_only {
     uint16_t hit_count : 4; // 0..3
     uint16_t : 10; // 13..4
@@ -110,7 +121,7 @@ typedef struct pmd_toa_only {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_toa_only_t;
+}) pmd_toa_only_t;
 
 DEFINE_PMD_MAP(toa_only)
 {
@@ -119,6 +130,7 @@ DEFINE_PMD_MAP(toa_only)
     DEFINE_PMD_PAIR(hit_count);
 }
 
+PACKED(
 typedef struct pmd_f_event_itot {
     uint16_t hit_count : 4; // 0..3
     uint16_t event_count : 10; // 13..4
@@ -126,7 +138,7 @@ typedef struct pmd_f_event_itot {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_f_event_itot_t;
+}) pmd_f_event_itot_t;
 
 DEFINE_PMD_MAP(f_event_itot)
 {
@@ -136,6 +148,7 @@ DEFINE_PMD_MAP(f_event_itot)
     DEFINE_PMD_PAIR(integral_tot);
 }
 
+PACKED(
 typedef struct pmd_event_itot {
     uint16_t : 4; // 0..3
     uint16_t event_count : 10; // 13..4
@@ -143,7 +156,7 @@ typedef struct pmd_event_itot {
     uint16_t coord_x : 8; // 35..28
     uint16_t coord_y : 8; // 43..36
     uint16_t : 4; // 44..47
-} __attribute__((__packed__)) pmd_event_itot_t;
+}) pmd_event_itot_t;
 
 DEFINE_PMD_MAP(event_itot)
 {
@@ -302,14 +315,14 @@ katherine_acquisition_fini(katherine_acquisition_t *acq)
     handle_measurement_data_##SUFFIX(katherine_acquisition_t *acq, const void *data)\
     {\
         static const int PIXEL_SIZE = sizeof(katherine_px_##SUFFIX##_t);\
-        const md_t *md = data;\
+        const md_t *md = ((const md_t*)data);\
         \
         if (md->header == 0x4) {\
             if (acq->pixel_buffer_valid == acq->pixel_buffer_max_valid) {\
                 flush_buffer(acq);\
             }\
             \
-            pmd_##SUFFIX##_map((katherine_px_##SUFFIX##_t *) acq->pixel_buffer + acq->pixel_buffer_valid, (pmd_##SUFFIX##_t *) md, acq);\
+            pmd_##SUFFIX##_map((katherine_px_##SUFFIX##_t *) ((char*)acq->pixel_buffer) + acq->pixel_buffer_valid, (pmd_##SUFFIX##_t *) md, acq);\
             ++acq->pixel_buffer_valid;\
         } else {\
             switch (md->header) {\
@@ -358,7 +371,7 @@ katherine_acquisition_fini(katherine_acquisition_t *acq)
             \
             tries = TRIES;\
             \
-            const void *it = acq->md_buffer;\
+            const /*void*/char *it = ((char*)acq->md_buffer);\
             for (i = 0; i < received; i += KATHERINE_MD_SIZE, it += KATHERINE_MD_SIZE) {\
                 handle_measurement_data_##SUFFIX(acq, it);\
             }\

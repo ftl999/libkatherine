@@ -10,11 +10,19 @@
  * @brief Main umbrella header.
  */
 
+#include "acquisition.h"
+#include "bmc.h"
+#include "config.h"
+#include "device.h"
+#include "status.h"
+#include "udp.h"
+
+/*
 #include <katherine/acquisition.h>
 #include <katherine/bmc.h>
 #include <katherine/config.h>
 #include <katherine/device.h>
 #include <katherine/status.h>
-#include <katherine/udp.h>
+#include <katherine/udp.h>*/
 
 #endif //THESIS_KATHERINE_H
