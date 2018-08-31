@@ -13,8 +13,7 @@ The library is froked from the libkatherine library of petrmanek and uses the sa
  - POSIX threads,
  - BSD socket interface.
  
- Since this fork aimes to guarantee full windows compatibility, under windows the POSIX threads are replaced by standard windows  
- API mutexes.
+ Since this fork aimes to guarantee full windows compatibility, under windows the POSIX threads are replaced by standard windows   API mutexes.
 
  The library is developed for Windows 7
 
