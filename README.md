@@ -7,13 +7,16 @@ It may be used to control and receive data from the Katherine readout.
 
 ## Build Notes
 
-The library uses the following dependencies:
+The library is froked from the libkatherine library of petrmanek and uses the same dependencies:
 
  - C11 standard library,
  - POSIX threads,
  - BSD socket interface.
+ 
+ Since this fork aimes to guarantee full windows compatibility, under windows the POSIX threads are replaced by standard windows  
+ API mutexes.
 
-For that reason, it is currently supported *only* on \*nix systems.
+ The library is developed for Windows 7
 
 
 ## Documentation
