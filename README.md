@@ -15,7 +15,7 @@ The library is froked from the libkatherine library of petrmanek and uses the sa
  
  Since this fork aimes to guarantee full windows compatibility, under windows the POSIX threads are replaced by standard windows   API mutexes.
 
- The library is developed for Windows 7
+ The library is developed for *nix systems and Windows 7
 
 
 ## Documentation
