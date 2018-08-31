@@ -29,6 +29,5 @@ High-level overview may be found in the Chapter 3 of the thesis.
 ## Copyright
 
 (c) Petr Mánek 2018, All rights reserved.
-(c) Felix Lehner 2018
 
 Contents of this library are provided for use under the conditions of the MIT License (see `LICENSE`).
