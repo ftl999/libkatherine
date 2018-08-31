@@ -21,6 +21,7 @@
   #pragma comment(lib, "Ws2_32.lib")  //Link against Ws2_32.lib
 #endif
 
+#include "MultiplattformNetwork.h"
 #include "MultiplattformTypes.h"
 
 #ifdef __cplusplus
