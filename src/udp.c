@@ -1,5 +1,6 @@
 //
 // Created by petr on 29.5.18.
+// Edited by Felix for Windows on 28.09.18
 //
 
 #include <stdlib.h>
@@ -13,7 +14,7 @@
 #include <sys/types.h>
 
 WSADATA wsaData;
-bool WSDataInitialized = false;
+_Bool WSDataInitialized = 0;
 #define INITWSDATA() if(!WSDataInitialized) { WSAStartup(MAKEWORD(2, 2), &wsaData);  WSDataInitialized = true; }
 
 #endif
