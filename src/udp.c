@@ -15,7 +15,16 @@
 
 WSADATA wsaData;
 _Bool WSDataInitialized = 0;
-#define INITWSDATA() if(!WSDataInitialized) { WSAStartup(MAKEWORD(2, 2), &wsaData);  WSDataInitialized = true; }
+static inline void INITWSDATA_MACRO()
+{
+    #ifdef WIN32
+	if (!WSDataInitialized) 
+	{ 
+		WSAStartup(MAKEWORD(2, 2), &wsaData);
+		WSDataInitialized = true; 
+	}
+    #endif
+}
 
 #endif
 #include <string.h>
@@ -33,7 +42,7 @@ _Bool WSDataInitialized = 0;
 int
 katherine_udp_init(katherine_udp_t *u, uint16_t local_port, const char *remote_addr, uint16_t remote_port, uint32_t timeout_ms)
 {
-	INITWSDATA();
+	INITWSDATA_MACRO();
     // Create socket.
     if ((u->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
         goto err_socket;
