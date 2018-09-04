@@ -30,8 +30,8 @@ extern "C" {
 
 typedef struct katherine_udp {
 	SOCKETTYPE sock;
-    struct sockaddr_in addr_local;
-    struct sockaddr_in addr_remote;
+	SOCKET_ADDR_T addr_local;
+	SOCKET_ADDR_T addr_remote;
 
 	MUTEXTYPE mutex;
 } katherine_udp_t;

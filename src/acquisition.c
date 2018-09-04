@@ -310,6 +310,74 @@ katherine_acquisition_fini(katherine_acquisition_t *acq)
     free(acq->pixel_buffer);
 }
 
+/** TEST 
+
+static inline void handle_measurement_data_f_toa_tot(katherine_acquisition_t *acq, const void *data)
+{
+	static const int PIXEL_SIZE = sizeof(katherine_px_f_toa_tot_t);
+        const md_t *md = ((const md_t*)data);\
+        if (md->header == 0x4) {
+            if (acq->pixel_buffer_valid == acq->pixel_buffer_max_valid) {
+                flush_buffer(acq);
+            }
+            
+            pmd_f_toa_tot_map((katherine_px_f_toa_tot_t *) ((char*)acq->pixel_buffer) + acq->pixel_buffer_valid, (pmd_f_toa_tot_t *) md, acq);
+            ++acq->pixel_buffer_valid;
+        } else {
+            switch (md->header) {
+            case 0x5: handle_timestamp_offset_driven_mode(acq, data); break;
+            case 0x7: handle_new_frame(acq, data); break;
+            case 0x8: handle_frame_start_timestamp_lsb(acq, data); break;
+            case 0x9: handle_frame_start_timestamp_msb(acq, data); break;
+            case 0xA: handle_frame_end_timestamp_lsb(acq, data); break;
+            case 0xB: handle_frame_end_timestamp_msb(acq, data); break;
+            case 0xC: handle_current_frame_finished(acq, data); break;
+            case 0xD: handle_lost_pixel_count(acq, data); break;
+            case 0xE: handle_aborted_measurement(acq, data); break;
+            default:  handle_unknown_msg(acq, data); break;
+            }
+        }
+}
+
+static int acquisition_read_f_toa_tot(katherine_acquisition_t *acq)
+{
+	static const int TRIES = 64; 
+	static const int PIXEL_SIZE = sizeof(katherine_px_f_toa_tot_t);
+    if (katherine_udp_mutex_lock(&acq->device->data_socket) != 0) return 1;
+    \
+    int tries = TRIES;
+    int res;
+    size_t i;
+    size_t received;
+    acq->pixel_buffer_valid = 0;
+    acq->pixel_buffer_max_valid = acq->pixel_buffer_size / PIXEL_SIZE;
+
+    while (acq->state == ACQUISITION_RUNNING) {
+        received = acq->md_buffer_size;
+        res = katherine_udp_recv(&acq->device->data_socket, acq->md_buffer, &received);
+        
+        if (res) {
+            if (--tries == 0) {
+                acq->state = ACQUISITION_TIMED_OUT;
+            }
+            
+            continue;
+        }
+        
+        tries = TRIES;
+        
+        const char *it = ((char*)acq->md_buffer);
+        for (i = 0; i < received; i += KATHERINE_MD_SIZE, it += KATHERINE_MD_SIZE) {
+            handle_measurement_data_f_toa_tot(acq, it);
+        }
+    }
+    
+    (void) katherine_udp_mutex_unlock(&acq->device->data_socket);
+    return acq->state == ACQUISITION_SUCCEEDED;
+}
+
+/*******/
+
 #define DEFINE_ACQ_IMPL(SUFFIX) \
     static inline void\
     handle_measurement_data_##SUFFIX(katherine_acquisition_t *acq, const void *data)\
