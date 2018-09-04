@@ -1,3 +1,4 @@
+#ifdef WIN32
 #ifndef _UNISTD_H
 #define _UNISTD_H    1
 
@@ -54,3 +55,4 @@ typedef unsigned __int32  uint32_t;
 typedef unsigned __int64  uint64_t;
 
 #endif /* unistd.h  */
+#endif //WIN32

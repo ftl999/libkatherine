@@ -1,6 +1,6 @@
-#include "katherine\KatherineConfigParser.h"
+#include "katherine/KatherineConfigParser.h"
 #include <iostream>
-#include <katherine\katherine.h>
+#include <katherine/katherine.h>
 #include <yaml-cpp/yaml.h>
 
 #ifdef WIN32

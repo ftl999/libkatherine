@@ -3,9 +3,9 @@
 #ifndef WIN32
 #include <pthread.h>
 #define MUTEXTYPE pthread_mutex_t
-#define CREATEMUTEX(mux) mux = PTHREAD_MUTEX_INITIALIZER
+#define CREATEMUTEX(mux) pthread_mutex_init(&mux, NULL)
 #define DESTROYMUTEX(mux) pthread_mutex_destroy(&mux)
-#define IS_MUTEX_VALID(mux) mux != NULL
+#define IS_MUTEX_VALID(mux) 1
 #define ACQUIRE_MUTEX(mux) pthread_mutex_lock(&mux);
 #define RELEASE_MUTEX(mux) pthread_mutex_unlock(&mux)
 

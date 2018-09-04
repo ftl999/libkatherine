@@ -6,7 +6,7 @@
 #include <string.h>
 #include <katherine/acquisition.h>
 #include <katherine/command_interface.h>
-#include "katherine\MultiplattformTypes.h"
+#include "katherine/MultiplattformTypes.h"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

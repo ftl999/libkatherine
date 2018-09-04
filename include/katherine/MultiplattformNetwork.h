@@ -2,15 +2,18 @@
 
 #ifndef WIN32
 #include <arpa/inet.h>
+#include <sys/time.h>
 #define SOCKETTYPE int
 #define SOCKET_ADDR_T struct sockaddr_in
 #define CLOSESOCK(sock) close(sock)
 #define INITWSDATA()
+#define SOCKET_ERROR -1
+#define INVALID_SOCKET -1
 static inline int TIMEOUT_MAKRO(int sock, uint32_t timeout_ms) {
 	struct timeval val;
 	val.tv_sec = timeout_ms / 1000.f;
-	val.tv_usec = 1000 * (timeout_ms % 1000)
-	return setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &val, sizeof(val));
+	val.tv_usec = 1000 * (timeout_ms % 1000);
+	return setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &val, sizeof(struct timeval));
 }
 #define SETTIMEOUT(sock, timeout_ms) TIMEOUT_MAKRO(sock, timeout_ms)
 #define OUTPUT_SOCKET_ERROR()
